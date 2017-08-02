@@ -333,8 +333,21 @@ void ILI9341_t3::invertDisplay(boolean i)
 	SPI.endTransaction();
 }
 
-
-
+// turn on / off tearing effect output
+// on_off true = on
+// mode 0 = vertical; mode 1 = vertical and horizontal
+void ILI9341_t3::tearing_effect (boolean on_off, uint8_t mode)
+	{
+	SPI.beginTransaction(SPISettings(SPIclock_write, MSBFIRST, SPI_MODE0));
+	if (on_off)		// turn on
+		{
+		writecommand_cont (ILI9341_TE_ON);
+		writecommand_last (mode ? 1 : 0);
+		}
+	else
+		writecommand_last (ILI9341_TE_OFF);
+	SPI.endTransaction();
+	}
 
 
 

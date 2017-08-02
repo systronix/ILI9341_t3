@@ -84,6 +84,10 @@
 #define ILI9341_RAMRD   0x2E
 
 #define ILI9341_PTLAR    0x30
+
+#define	ILI9341_TE_OFF		0x34
+#define	ILI9341_TE_ON		0x35	// requires second byte to select mode 0x00 = vertical only; 0x01 = vertical and horizontal
+
 #define ILI9341_MADCTL   0x36
 #define ILI9341_VSCRSADD 0x37
 #define ILI9341_PIXFMT   0x3A
@@ -173,6 +177,9 @@ class ILI9341_t3 : public Print
 	// read SPI clock is slower, up to 6.67 MHz
 	void setSPIclock_write(uint32_t speed);	
 	void setSPIclock_read(uint32_t speed);
+	
+	// [wsk] 2017Aug01
+	void tearing_effect (boolean on_off, uint8_t mode);
 	
 	void begin(void);
   	void sleep(bool enable);		

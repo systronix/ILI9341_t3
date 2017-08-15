@@ -320,7 +320,25 @@ class ILI9341_t3 : public Print
 			if (sr & 0xF0) tmp = KINETISK_SPI0.POPR;  // drain RX FIFO
 		} while ((sr & (15 << 12)) > (3 << 12));
 	}
-	void waitFifoEmpty(void) {
+//----------
+// Systronix fix
+	void waitFifoEmpty(void)
+		{
+		uint32_t sr;
+		uint32_t tmp __attribute__((unused));
+		do
+			{
+			sr = KINETISK_SPI0.SR;
+			if (!(sr & 0xF000))						// TX fifo goes empty on leading edge of SCK; if TX fifo is empty
+				delayMicroseconds(1);				// insert a brief pause to allow next edge of SCK to write last MISO value into the fifo
+
+			sr = KINETISK_SPI0.SR;					// refresh
+			if (sr & 0xF0)
+				tmp = KINETISK_SPI0.POPR;			// drain RX FIFO
+			} while ((sr & 0xF0F0) > 0);			// wait both RX & TX empty
+		}
+//----------
+/*	void waitFifoEmpty(void) {
 		uint32_t sr;
 		uint32_t tmp __attribute__((unused));
 		do {
@@ -328,7 +346,7 @@ class ILI9341_t3 : public Print
 			if (sr & 0xF0) tmp = KINETISK_SPI0.POPR;  // drain RX FIFO
 		} while ((sr & 0xF0F0) > 0);             // wait both RX & TX empty
 	}
-	void waitTransmitComplete(void) __attribute__((always_inline)) {
+*/	void waitTransmitComplete(void) __attribute__((always_inline)) {
 		uint32_t tmp __attribute__((unused));
 		while (!(KINETISK_SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
 		tmp = KINETISK_SPI0.POPR;                  // drain the final RX FIFO word
